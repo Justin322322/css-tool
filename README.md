@@ -2,6 +2,9 @@
 
 A powerful browser extension for developers to inspect, compare, and analyze CSS properties across different elements and breakpoints.
 
+<img width="581" height="459" alt="image" src="https://github.com/user-attachments/assets/91ff4249-8701-4752-acf4-8467447a7fbb" />
+
+
 ## Features
 
 ### Core Functionality
