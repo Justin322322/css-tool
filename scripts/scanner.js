@@ -45,21 +45,24 @@ class CSSScanner {
   }
 
   handleClick(event) {
-    if (!this.isActive || !this.currentTarget) return;
-    if (this.isOwnElement(event.target)) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    let textToCopy;
-    if (this.stylePanel.isComparisonMode) {
-      textToCopy = this.stylePanel.getDifferencesCSS();
-    } else {
-      textToCopy = this.getComputedCSSString(this.stylePanel.currentStyleGroups);
+    if (!this.isActive || !this.currentTarget || this.isOwnElement(event.target)) {
+      return;
     }
 
-    this.copyToClipboard(textToCopy);
-    this.stylePanel.showCopyFeedback();
+    if (event.shiftKey) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      let textToCopy;
+      if (this.stylePanel.isComparisonMode) {
+        textToCopy = this.stylePanel.getDifferencesCSS();
+      } else {
+        textToCopy = this.getComputedCSSString(this.stylePanel.currentStyleGroups);
+      }
+
+      this.copyToClipboard(textToCopy);
+      this.stylePanel.showCopyFeedback();
+    }
   }
 
   getComputedCSSString(styleGroups) {
@@ -72,47 +75,19 @@ class CSSScanner {
     return css;
   }
 
-  copyToClipboard(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).catch(err => {
-        console.error('Failed to copy:', err);
-        this.fallbackCopy(text);
-      });
-    } else {
-      this.fallbackCopy(text);
-    }
-  }
-
-  fallbackCopy(text) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
+  async copyToClipboard(text) {
     try {
-      document.execCommand('copy');
+      await navigator.clipboard.writeText(text);
     } catch (err) {
-      console.error('Fallback copy failed:', err);
+      console.error('Failed to copy text: ', err);
     }
-    document.body.removeChild(textarea);
   }
 
   handleMouseMove(event) {
     if (this.isPaused || !this.isActive) return;
 
-    const wasVisible = this.highlightOverlay && this.highlightOverlay.style.display !== 'none';
-    if (wasVisible) {
-      this.highlightOverlay.style.display = 'none';
-    }
-
-    const elementUnderCursor = document.elementFromPoint(event.clientX, event.clientY);
-
-    if (wasVisible) {
-      this.highlightOverlay.style.display = 'block';
-    }
-
-    if (this.isOwnElement(elementUnderCursor)) return;
+    const elements = document.elementsFromPoint(event.clientX, event.clientY);
+    const elementUnderCursor = elements.find(el => !this.isOwnElement(el));
 
     if (elementUnderCursor && elementUnderCursor !== this.currentTarget) {
       this.currentTarget = elementUnderCursor;

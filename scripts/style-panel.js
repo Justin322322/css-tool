@@ -13,11 +13,10 @@ class StylePanel {
     this.breakpoints = [
       { name: 'Mobile', width: 375, icon: 'smartphone' },
       { name: 'Tablet', width: 768, icon: 'tablet' },
-      { name: 'Desktop', width: 1440, icon: 'monitor' }
+      { name: 'Desktop', width: 1440, icon: 'monitor' },
     ];
     this.currentBreakpoint = null;
     this.breakpointStyles = {};
-    this.create();
   }
 
   create() {
@@ -26,10 +25,9 @@ class StylePanel {
     this.panel = document.createElement('div');
     this.panel.id = 'css-scan-panel';
     this.panel.style.display = 'none';
-
     this.panel.innerHTML = this.getTemplate();
     document.body.appendChild(this.panel);
-    
+
     this.attachEventListeners();
   }
 
@@ -95,33 +93,17 @@ class StylePanel {
   }
 
   show(element, styleGroups, position) {
+    if (!this.panel) {
+      this.create();
+    }
     this.currentElement = element;
     this.currentStyleGroups = styleGroups;
     this.render();
 
     this.panel.style.display = 'flex';
 
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const panelWidth = 380;
-    const panelHeight = Math.min(600, viewportHeight - 40);
-
-    let left = position.x + 20;
-    let top = position.y + 20;
-
-    if (left + panelWidth > viewportWidth) {
-      left = position.x - panelWidth - 20;
-    }
-
-    if (top + panelHeight > viewportHeight) {
-      top = viewportHeight - panelHeight - 20;
-    }
-
-    left = Math.max(10, left);
-    top = Math.max(10, top);
-
-    this.panel.style.left = `${left}px`;
-    this.panel.style.top = `${top}px`;
+    this.panel.style.right = '20px';
+    this.panel.style.top = '20px';
   }
 
   hide() {
